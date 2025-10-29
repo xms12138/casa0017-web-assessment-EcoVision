@@ -67,27 +67,6 @@ MAX30105
 
 ## Wiring
 
-### Quick Reference:
-```
-MAX3010x:
-├─ SDA → MKR SDA
-├─ SCL → MKR SCL
-├─ VIN → 3.3V
-└─ GND → GND
-
-Grove RGB LCD:
-├─ SDA → MKR SDA
-├─ SCL → MKR SCL
-├─ VCC → 5V (or 3.3V)
-└─ GND → GND
-
-Sound Sensor v1.6:
-├─ OUT → A2
-├─ VCC → 5V (check your module)
-└─ GND → GND
-```
-
-### Notes:
 * Both MAX3010x and LCD share the I²C bus
 * Sound sensor output must go to analog pin
 * Check your sound sensor voltage (3.3V or 5V compatible)
@@ -180,23 +159,6 @@ r0:     (arcs start from bottom, bulge upward)
 
 ```
 
-### Layer Blending:
-```cpp
-// Step 1: Draw music layer (base)
-for each pixel: set RGB based on volume/beat
-
-// Step 2: Add heart layer (overlay)
-if (fingerOn && haveHeart) {
-  for each heart pixel: 
-    RGB_final = RGB_music + RGB_heart  // Additive blend
-}
-
-// Step 3: Send to MQTT
-publish(mqtt_topic, RGBpayload, 216);
-```
-
----
-
 ## LCD Display
 
 ### Display States:
@@ -216,23 +178,6 @@ BPM > 120:  ❤️ Red     (high)
 ```
 
 **Note:** BPM display is **approximate** for visualization .  
-
----
-
-### Finger Detection:
-```cpp
-IR_ON_THRESH   = 18000   // Finger present (IR threshold)
-IR_OFF_THRESH  = 12000   // Finger removed (IR threshold)
-AC_ON_THRESH   = 1200    // Finger present (AC threshold)
-AC_OFF_THRESH  = 600     // Finger removed (AC threshold)
-AC_DC_MIN      = 0.005f  // Min AC/DC ratio (0.5%)
-AC_DC_MAX      = 0.30f   // Max AC/DC ratio (30%)
-
-FINGER_ON_STABLE_MS  = 150   // Debounce time (finger on)
-FINGER_OFF_STABLE_MS = 600   // Debounce time (finger off)
-```
-
-
 
 ### Problem solution: No heartbeat detected
 
