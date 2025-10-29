@@ -100,21 +100,6 @@ ring0:     (0,0) (1,0) (2,0) (3,0) (4,0) (5,0) (6,0) (7,0) (8,0) (9,0) (10,0)(11
            ↑ bottom                                                            ↑
 ```
 
-### Index Formula:
-```cpp
-// Linear index (0-71)
-idx = ring + NUM_RINGS * col;   // NUM_RINGS = 6
-
-// Byte offset in payload
-offset = idx * 3;                // R,G,B (3 bytes per pixel)
-
-// Example: (col=3, ring=2)
-// idx = 2 + 6*3 = 20
-// payload[60] = R, payload[61] = G, payload[62] = B
-```
-
----
-
 ## 🎨 Visual Design
 
 ### A) Music Layer (Blue → Red)
