@@ -4,28 +4,10 @@
 
 ![Arduino](https://img.shields.io/badge/Arduino-MKR_WiFi_1010-00979D?style=flat&logo=arduino)
 ![MQTT](https://img.shields.io/badge/MQTT-Protocol-660066?style=flat)
-![License](https://img.shields.io/badge/License-Educational-blue?style=flat)
 
 ---
 
-## 📖 Table of Contents
-- [Overview](#overview)
-- [Demo Points](#demo-points)
-- [Hardware](#hardware)
-- [Wiring](#wiring)
-- [Quick Start](#quick-start)
-- [Pixel Layout](#pixel-layout)
-- [Visual Design](#visual-design)
-- [LCD Display](#lcd-display)
-- [Key Parameters](#key-parameters)
-- [Troubleshooting](#troubleshooting)
-- [Test Checklist](#test-checklist)
-- [Repository Structure](#repository-structure)
-- [Disclaimer](#disclaimer)
-
----
-
-## 🎨 Overview
+## Overview
 
 **BEAT** : **music beat**   +   **heartbeat**.
 
@@ -44,7 +26,7 @@
 
 ---
 
-## 🎯 Demo Points 
+## Demo Points 
 
 ### Core Concept:
 * **Two layers blend together:** Music band (bottom→top) + Heart arcs (from center)
@@ -61,7 +43,7 @@
 
 ---
 
-## 🔧 Hardware
+## Hardware
 
 ### Components:
 | Component | Model | Interface | Notes |
@@ -83,7 +65,7 @@ MAX30105
 
 ---
 
-## 🔌 Wiring
+## Wiring
 
 ### Quick Reference:
 ```
@@ -112,7 +94,7 @@ Sound Sensor v1.6:
 
 ---
 
-## 🚀 Quick Start
+## Start
 
 ### 1. Upload
 1. Install required libraries
@@ -122,7 +104,7 @@ Sound Sensor v1.6:
 
 ---
 
-## 📐 Pixel Layout (72 pixels)
+## Pixel Layout (72 pixels)
 
 ### Grid Structure:
 **6 rings** (bottom→top) × **12 columns** (around)
@@ -215,7 +197,7 @@ publish(mqtt_topic, RGBpayload, 216);
 
 ---
 
-## 🖥️ LCD Display
+## LCD Display
 
 ### Display States:
 
@@ -250,9 +232,10 @@ FINGER_ON_STABLE_MS  = 150   // Debounce time (finger on)
 FINGER_OFF_STABLE_MS = 600   // Debounce time (finger off)
 ```
 
-## 🔍 Troubleshooting
 
-### Problem: No heartbeat detected
+
+### Problem solution: No heartbeat detected
+
 **Symptoms:**
 
 ```
@@ -262,5 +245,5 @@ IR:32796  AC:8480  AC/DC:0.259  finger:1
 
 ---
 
-**Built with ❤️ and 🎵 for CASA0014**
+**Built with ❤️ and 🎵 **
 
