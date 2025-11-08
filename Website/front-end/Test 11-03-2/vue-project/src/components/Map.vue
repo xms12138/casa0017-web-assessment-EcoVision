@@ -6,8 +6,7 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-mapboxgl.accessToken =
-  "pk.eyJ1IjoieG1zMTIxMzgiLCJhIjoiY21oaWw5cnRoMDIyazJpc2Q4azF3ZW81eCJ9.p5vgHrhM1hR6Bvl-vjmO7A";
+mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 export default {
   mounted() {
