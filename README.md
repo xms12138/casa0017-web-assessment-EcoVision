@@ -1,8 +1,8 @@
-# EcoVision – Mapping London’s Vehicle Emissions and Air Quality  
-### CASA0017: Web Architecture Final Assessment  
+# EcoVision Team  
+### CASA0017 – Web Architecture Final Group Assessment  
 
 <p align="center">
-  <img src="./assets/logos/ecovision-logo.png" alt="EcoVision Logo" width="250"/>
+  <img src="./assets/logos/ecovision-logo.png" alt="EcoVision Team Logo" width="220"/>
 </p>
 
 ---
@@ -10,48 +10,43 @@
 **Team Members:** Madina Diallo, Matilda Nelson, Qingshan Luo, Yidan Gao, Zihang He  
 **Institution:** University College London (UCL) – Centre for Advanced Spatial Analysis (CASA)  
 **Module:** CASA0017 Web Architecture  
-**Academic Year:** 2025–2026 
+**Academic Year:** 2024–2025  
 
 ---
 
-### 🔗 Live Website  
-👉 [Visit EcoVision Interactive Map](https://xms12138.github.io/casa0017-web-assessment-EcoVision/)  
-
-<p align="center">
-  <img src="./assets/screenshots/ecovision-map-preview.gif" alt="EcoVision Interactive Map Preview" width="700"/>
-</p>
+### Click below to view the live test version  
+ [EcoVision Interactive Map](https://xms12138.github.io/casa0017-web-assessment-EcoVision/)
 
 ---
 
-## 🌍 Project Overview  
+## Project Overview  
 
-**EcoVision** is an interactive data-driven platform that visualises **London’s air quality and traffic emissions** in real time across all **33 boroughs**.  
-Our goal is to help Londoners **understand how traffic affects air pollution** and encourage **sustainable travel choices**.  
+**EcoVision** is an interactive website created to visualise how **vehicle emissions** and **traffic levels** impact **air quality across London’s 33 boroughs**.  
+Our goal is to make environmental data more accessible and help the public understand how **daily travel choices** affect pollution levels in their local area.
 
-The website enables users to:  
-✅ Explore **hourly pollution changes** throughout a 24-hour period  
-✅ View **borough-specific CO₂/NO₂ levels** alongside traffic density  
-✅ Compare **cycling vs car travel times** for short trips  
-✅ Discover how behaviour change can improve urban air quality  
+Through our dynamic map, users can:  
+- View **hourly changes in air quality** (CO₂ / NO₂) alongside **traffic density** over a 24-hour period.  
+- Click on each borough to reveal its air-quality index, traffic data, and insights.  
+- Explore a **cycling-vs-car comparison** tool showing journey-time differences for short distances, promoting greener travel.  
 
-EcoVision transforms open data into a **simple, intuitive visual story**, showing that small daily choices can contribute to a cleaner, healthier London.  
+EcoVision transforms complex datasets into a **clear, interactive experience**, encouraging people to make **informed decisions** about mobility and sustainability.
 
 ---
 
-## 🧭 Research Context  
+## Research Context  
 
-Air pollution remains a leading environmental challenge in London, impacting public health, biodiversity, and climate.  
-While open datasets exist, they are often presented in static formats that are difficult for everyday citizens to interpret.  
+Air pollution is one of London’s most critical environmental and public-health issues.  
+Although open data sources provide valuable insights, they are often buried in static reports that are difficult for the public to interpret.
 
-EcoVision bridges this gap through **interactive storytelling**, combining spatial data, time-based visualisation, and actionable insights.  
+**EcoVision bridges this gap** by combining open-source data with visual storytelling, turning numbers into an interactive, time-based urban narrative.
 
-### 📚 Key Data Sources  
-- **Transport for London (TfL)** – Traffic flow and congestion data  
-- **London Air Quality Network (LAQN)** – Hourly pollutant concentrations  
-- **Centre for London** – Sustainability research and urban insights  
+### Data Sources  
+- **Transport for London (TfL)** – Traffic and congestion data  
+- **London Air Quality Network (LAQN)** – Air pollution datasets  
 - **Greater London Authority (GLA)** – Borough boundaries and statistics  
+- **Centre for London** – Environmental and policy research reports  
 
-This project supports **UN Sustainable Development Goal 11 – Sustainable Cities and Communities**.  
+This project aligns with the **UN Sustainable Development Goals (SDG 11 – Sustainable Cities and Communities)**.
 
 ---
 
@@ -61,11 +56,19 @@ This project supports **UN Sustainable Development Goal 11 – Sustainable Citie
 |-----------|------------------|
 | **Frontend** | HTML5, CSS3, JavaScript |
 | **Mapping & Visualisation** | Leaflet.js, D3.js |
-| **Data Integration** | JSON, CSV, Node.js (optional for dynamic updates) |
-| **Version Control & Hosting** | GitHub, GitHub Pages |
-| **Design & Collaboration** | Teams, Canva, Google Docs, Slack |
+| **Data Handling** | JSON, CSV |
+| **Collaboration & Design** | GitHub, Teams, Canva, Google Docs, Slack |
+| **Hosting** | GitHub Pages |
 
-The site was built to be lightweight, responsive, and modular, suitable for future expansion or live API integration.  
+The system follows a modular architecture so that data and visual components can easily be updated or expanded in future.
 
 ---
 
+## Installation & Local Setup  
+
+To run EcoVision locally on your computer:
+
+1. **Clone the repository**  
+   ```bash
+   git clone https://github.com/xms12138/casa0017-web-assessment-EcoVision.git
+   cd casa0017-EcoVision Web Project Assessment
