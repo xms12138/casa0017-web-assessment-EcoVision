@@ -1,36 +1,71 @@
-# CASA0017 Web Assessment ReadMe File
+# EcoVision – Mapping London’s Vehicle Emissions and Air Quality  
+### CASA0017: Web Architecture Final Assessment  
 
+<p align="center">
+  <img src="./assets/logos/ecovision-logo.png" alt="EcoVision Logo" width="250"/>
+</p>
 
+---
 
+**Team Members:** Madina Diallo, Matilda Nelson, Qingshan Luo, Yidan Gao, Zihang He  
+**Institution:** University College London (UCL) – Centre for Advanced Spatial Analysis (CASA)  
+**Module:** CASA0017 Web Architecture  
+**Academic Year:** 2025–2026 
 
+---
 
-### Click here to view the test version: https://xms12138.github.io/casa0017-web-assessment-EcoVision/
+### 🔗 Live Website  
+👉 [Visit EcoVision Interactive Map](https://xms12138.github.io/casa0017-web-assessment-EcoVision/)  
 
+<p align="center">
+  <img src="./assets/screenshots/ecovision-map-preview.gif" alt="EcoVision Interactive Map Preview" width="700"/>
+</p>
 
+---
 
-# Mapping London's Vehicles Emmissions and Air Quality
+## 🌍 Project Overview  
 
-This is the Final assessment template for CASA0017 - Please use this template and edit the relevant sections to personalise.
-This section has a short introduction to what the website is about and what research problem the site is solving.  Remeber this file showcases your website source code so use it to sell what you can do as a group or showcase in a future portfolio. 
+**EcoVision** is an interactive data-driven platform that visualises **London’s air quality and traffic emissions** in real time across all **33 boroughs**.  
+Our goal is to help Londoners **understand how traffic affects air pollution** and encourage **sustainable travel choices**.  
 
-## Use this README File 
+The website enables users to:  
+✅ Explore **hourly pollution changes** throughout a 24-hour period  
+✅ View **borough-specific CO₂/NO₂ levels** alongside traffic density  
+✅ Compare **cycling vs car travel times** for short trips  
+✅ Discover how behaviour change can improve urban air quality  
 
-Use this section to show us what your Website is about.   Include a Screenshot to the Website in this README file, link to the various frameworks you've used.  If you want to show off your website you can add a Gif of you interacting with your site.   Emojis are also fun to include as well 😄
+EcoVision transforms open data into a **simple, intuitive visual story**, showing that small daily choices can contribute to a cleaner, healthier London.  
 
-Look at some other Websites online in GitHub and see how they use the README File to showcase thier site.  Good examples are:
+---
 
-- https://github.com/smaranjitghose/awesome-portfolio-websites
-- https://github.com/gohugoio/hugo    
-- https://github.com/academicpages/academicpages.github.io
+## 🧭 Research Context  
 
-##  Replace the Tags on the side menu of GitHub
+Air pollution remains a leading environmental challenge in London, impacting public health, biodiversity, and climate.  
+While open datasets exist, they are often presented in static formats that are difficult for everyday citizens to interpret.  
 
-Put some tags in to make your site more searchable in GitHub
+EcoVision bridges this gap through **interactive storytelling**, combining spatial data, time-based visualisation, and actionable insights.  
 
-## Include A Section That Tells Developers How To Install The App
+### 📚 Key Data Sources  
+- **Transport for London (TfL)** – Traffic flow and congestion data  
+- **London Air Quality Network (LAQN)** – Hourly pollutant concentrations  
+- **Centre for London** – Sustainability research and urban insights  
+- **Greater London Authority (GLA)** – Borough boundaries and statistics  
 
-Include a section that gives intructions on how to install the app or run it in Docker.  What versions of the plugins are you assuming?  Maybe define a licence as well, this is good practise.
+This project supports **UN Sustainable Development Goal 11 – Sustainable Cities and Communities**.  
 
-##  Contact Details
+---
 
-Having Contact Details is also good as it shows people how to get in contact with you if they'd like to contribute to the app. 
+## 💻 Technical Stack  
+
+| Category | Tools / Libraries |
+|-----------|------------------|
+| **Frontend** | HTML5, CSS3, JavaScript |
+| **Mapping & Visualisation** | Leaflet.js, D3.js |
+| **Data Integration** | JSON, CSV, Node.js (optional for dynamic updates) |
+| **Version Control & Hosting** | GitHub, GitHub Pages |
+| **Design & Collaboration** | Teams, Canva, Google Docs, Slack |
+
+The site was built to be lightweight, responsive, and modular, suitable for future expansion or live API integration.  
+
+---
+
