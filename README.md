@@ -10,7 +10,7 @@
 **Team Members:** Madina Diallo, Matilda Nelson, Qingshan Luo, Yidan Gao, Zihang He  
 **Institution:** University College London (UCL) – Centre for Advanced Spatial Analysis (CASA)  
 **Module:** CASA0017 Web Architecture  
-**Academic Year:** 2024–2025  
+**Academic Year:** 2025–2026  
 
 ---
 
