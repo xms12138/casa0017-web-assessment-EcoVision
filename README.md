@@ -1,36 +1,74 @@
-# CASA0017 Web Assessment ReadMe File
+# EcoVision Team  
+### CASA0017 – Web Architecture Final Group Assessment  
 
+<p align="center">
+  <img src="./assets/logos/ecovision-logo.png" alt="EcoVision Team Logo" width="220"/>
+</p>
 
+---
 
+**Team Members:** Madina Diallo, Matilda Nelson, Qingshan Luo, Yidan Gao, Zihang He  
+**Institution:** University College London (UCL) – Centre for Advanced Spatial Analysis (CASA)  
+**Module:** CASA0017 Web Architecture  
+**Academic Year:** 2025–2026  
 
+---
 
-### Click here to view the test version: https://xms12138.github.io/casa0017-web-assessment-EcoVision/
+### Click below to view the live test version  
+ [EcoVision Interactive Map](https://xms12138.github.io/casa0017-web-assessment-EcoVision/)
 
+---
 
+## Project Overview  
 
-# Mapping London's Vehicles Emmissions and Air Quality
+**EcoVision** is an interactive website created to visualise how **vehicle emissions** and **traffic levels** impact **air quality across London’s 33 boroughs**.  
+Our goal is to make environmental data more accessible and help the public understand how **daily travel choices** affect pollution levels in their local area.
 
-This is the Final assessment template for CASA0017 - Please use this template and edit the relevant sections to personalise.
-This section has a short introduction to what the website is about and what research problem the site is solving.  Remeber this file showcases your website source code so use it to sell what you can do as a group or showcase in a future portfolio. 
+Through our dynamic map, users can:  
+- View **hourly changes in air quality** (CO₂ / NO₂) alongside **traffic density** over a 24-hour period.  
+- Click on each borough to reveal its air-quality index, traffic data, and insights.  
+- Explore a **cycling-vs-car comparison** tool showing journey-time differences for short distances, promoting greener travel.  
 
-## Use this README File 
+EcoVision transforms complex datasets into a **clear, interactive experience**, encouraging people to make **informed decisions** about mobility and sustainability.
 
-Use this section to show us what your Website is about.   Include a Screenshot to the Website in this README file, link to the various frameworks you've used.  If you want to show off your website you can add a Gif of you interacting with your site.   Emojis are also fun to include as well 😄
+---
 
-Look at some other Websites online in GitHub and see how they use the README File to showcase thier site.  Good examples are:
+## Research Context  
 
-- https://github.com/smaranjitghose/awesome-portfolio-websites
-- https://github.com/gohugoio/hugo    
-- https://github.com/academicpages/academicpages.github.io
+Air pollution is one of London’s most critical environmental and public-health issues.  
+Although open data sources provide valuable insights, they are often buried in static reports that are difficult for the public to interpret.
 
-##  Replace the Tags on the side menu of GitHub
+**EcoVision bridges this gap** by combining open-source data with visual storytelling, turning numbers into an interactive, time-based urban narrative.
 
-Put some tags in to make your site more searchable in GitHub
+### Data Sources  
+- **Transport for London (TfL)** – Traffic and congestion data  
+- **London Air Quality Network (LAQN)** – Air pollution datasets  
+- **Greater London Authority (GLA)** – Borough boundaries and statistics  
+- **Centre for London** – Environmental and policy research reports  
 
-## Include A Section That Tells Developers How To Install The App
+This project aligns with the **UN Sustainable Development Goals (SDG 11 – Sustainable Cities and Communities)**.
 
-Include a section that gives intructions on how to install the app or run it in Docker.  What versions of the plugins are you assuming?  Maybe define a licence as well, this is good practise.
+---
 
-##  Contact Details
+## 💻 Technical Stack  
 
-Having Contact Details is also good as it shows people how to get in contact with you if they'd like to contribute to the app. 
+| Category | Tools / Libraries |
+|-----------|------------------|
+| **Frontend** | HTML5, CSS3, JavaScript |
+| **Mapping & Visualisation** | Leaflet.js, D3.js |
+| **Data Handling** | JSON, CSV |
+| **Collaboration & Design** | GitHub, Teams, Canva, Google Docs, Slack |
+| **Hosting** | GitHub Pages |
+
+The system follows a modular architecture so that data and visual components can easily be updated or expanded in future.
+
+---
+
+## Installation & Local Setup  
+
+To run EcoVision locally on your computer:
+
+1. **Clone the repository**  
+   ```bash
+   git clone https://github.com/xms12138/casa0017-web-assessment-EcoVision.git
+   cd casa0017-EcoVision Web Project Assessment
