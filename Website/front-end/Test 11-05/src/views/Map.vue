@@ -24,6 +24,7 @@
       <!-- Map Container -->
       <div class="map-container-wrapper">
         <div ref="mapContainer" class="map-container"></div>
+        <MapLegend />
       </div>
 
       <!-- Info Section -->
@@ -56,8 +57,8 @@
           <div class="info-card">
             <h3>Data Sources</h3>
             <p>
-              Powered by London Air Quality Network and TfL open datasets for
-              accurate, reliable information.
+              Powered by the London Air Quality Network and TfL open datasets
+              for accurate, reliable information.
             </p>
           </div>
         </div>
@@ -77,15 +78,21 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { onMounted, onBeforeUnmount, onActivated, ref } from "vue";
-
+import MapLegend from "../components/MapLegend.vue";
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
 const BOROUGH_SOURCE_ID = "london-boroughs";
 const BOROUGH_FILL_ID = "borough-fill";
 const BOROUGH_BORDER_GLOW_ID = "borough-border-glow";
 const LONDON_OUTER_GLOW_ID = "london-outer-glow";
+const BOROUGH_LABEL_ID = "borough-labels";
+// Default active hour (0–23). Later this can be linked with the time slider.
+const ACTIVE_HOUR = 1;
 
 export default {
+  components: {
+    MapLegend,
+  },
   setup() {
     const mapContainer = ref(null);
     let map = null;
@@ -98,28 +105,47 @@ export default {
       if (app) app.scrollTop = 0;
     };
 
-    // 随机颜色：后面可以用 pm2.5 替换掉这里
-    const randomColor = () => {
-      const hue = Math.floor(Math.random() * 360);
-      return `hsl(${hue}, 70%, 55%)`;
-    };
-
     const addBoroughLayers = async () => {
       try {
-        // 从 public 目录加载 GeoJSON
-        const res = await fetch("/london_boroughs.geojson");
-        const geojson = await res.json();
+        // Load both boundary and test data
+        const [geoRes, aqRes] = await Promise.all([
+          fetch("/london_boroughs.geojson"),
+          fetch("/borough_air_quality.json"),
+        ]);
 
-        // 为每个 borough 添加随机颜色（后面可换成真实数据）
+        const geojson = await geoRes.json();
+        const aq = await aqRes.json();
+
+        // Map air quality data: borough name -> hourly data
+        const aqMap = new Map();
+        aq.data.forEach((entry) => {
+          aqMap.set(entry.borough, entry.hourly);
+        });
+
+        // Attach pm2.5 value to each borough feature
         geojson.features = geojson.features.map((f) => {
+          const name =
+            f.properties.NAME ||
+            f.properties.BOROUGH ||
+            f.properties.LAD13NM ||
+            f.properties.name;
+
+          const hourly = aqMap.get(name);
+          const pm25Array = hourly?.pm25;
+          const pm25 =
+            Array.isArray(pm25Array) && pm25Array.length > 0
+              ? pm25Array[ACTIVE_HOUR] ?? pm25Array[0]
+              : 0;
+
           f.properties = {
             ...f.properties,
-            fillColor: randomColor(),
+            pm25,
           };
+
           return f;
         });
 
-        // 数据源
+        // Add or update data source
         if (!map.getSource(BOROUGH_SOURCE_ID)) {
           map.addSource(BOROUGH_SOURCE_ID, {
             type: "geojson",
@@ -129,20 +155,36 @@ export default {
           map.getSource(BOROUGH_SOURCE_ID).setData(geojson);
         }
 
-        // 1️⃣ Borough 填充
+        // 1️⃣ Fill color by pm2.5 level
         if (!map.getLayer(BOROUGH_FILL_ID)) {
           map.addLayer({
             id: BOROUGH_FILL_ID,
             type: "fill",
             source: BOROUGH_SOURCE_ID,
             paint: {
-              "fill-color": ["get", "fillColor"],
-              "fill-opacity": 0.6,
+              "fill-color": [
+                "interpolate",
+                ["linear"],
+                ["get", "pm25"],
+                0,
+                "#22c55e",
+                10,
+                "#84cc16",
+                20,
+                "#eab308",
+                30,
+                "#f97316",
+                40,
+                "#ef4444",
+                60,
+                "#7f1d1d",
+              ],
+              "fill-opacity": 0.78,
             },
           });
         }
 
-        // 2️⃣ 外圈 glow
+        // 2️⃣ Outer glow outline
         if (!map.getLayer(LONDON_OUTER_GLOW_ID)) {
           map.addLayer({
             id: LONDON_OUTER_GLOW_ID,
@@ -156,7 +198,7 @@ export default {
           });
         }
 
-        // 3️⃣ 内部边界亮线
+        // 3️⃣ Borough borders
         if (!map.getLayer(BOROUGH_BORDER_GLOW_ID)) {
           map.addLayer({
             id: BOROUGH_BORDER_GLOW_ID,
@@ -164,34 +206,68 @@ export default {
             source: BOROUGH_SOURCE_ID,
             paint: {
               "line-color": "#ffffff",
-              "line-width": 1.4,
+              "line-width": 1.2,
               "line-opacity": 0.9,
             },
           });
         }
 
-        // 4️⃣ 自动缩放到包含所有 borough 的范围（关键部分）
+        // 4️⃣ Borough name labels
+        if (!map.getLayer(BOROUGH_LABEL_ID)) {
+          map.addLayer({
+            id: BOROUGH_LABEL_ID,
+            type: "symbol",
+            source: BOROUGH_SOURCE_ID,
+            layout: {
+              "text-field": [
+                "coalesce",
+                ["get", "NAME"],
+                ["get", "BOROUGH"],
+                ["get", "LAD13NM"],
+                ["get", "name"],
+              ],
+              "text-font": ["Open Sans Semibold", "Arial Unicode MS Bold"],
+              "text-size": 11,
+              "text-offset": [0, 0],
+              "text-anchor": "center",
+              "text-allow-overlap": false,
+            },
+            paint: {
+              "text-color": "#ffffff",
+              "text-halo-color": "rgba(10,10,15,0.9)",
+              "text-halo-width": 1.4,
+            },
+          });
+        }
+
+        // 5️⃣ Auto-fit map to borough bounds
         const bounds = new mapboxgl.LngLatBounds();
         geojson.features.forEach((f) => {
-          // 兼容 Polygon / MultiPolygon
           const geom = f.geometry;
           const coords =
             geom.type === "Polygon"
               ? geom.coordinates.flat()
               : geom.coordinates.flat(2);
 
-          for (let i = 0; i < coords.length; i++) {
-            const [lng, lat] = coords[i];
+          coords.forEach(([lng, lat]) => {
             bounds.extend([lng, lat]);
-          }
+          });
         });
 
         map.fitBounds(bounds, {
           padding: 40,
-          maxZoom: 9.2, // 限制别太近，这样看得到全貌
+          maxZoom: 9.2,
+        });
+
+        // 6️⃣ Change cursor to pointer when hovering over boroughs
+        map.on("mouseenter", BOROUGH_FILL_ID, () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", BOROUGH_FILL_ID, () => {
+          map.getCanvas().style.cursor = "";
         });
       } catch (err) {
-        console.error("❌ Failed to load london_boroughs.geojson", err);
+        console.error("❌ Failed to load map or air quality data", err);
       }
     };
 
@@ -203,8 +279,8 @@ export default {
           center: [-0.1276, 51.5072],
           zoom: 9,
           maxBounds: [
-            [-0.6, 51.2], // 西南角
-            [0.4, 51.8], // 东北角
+            [-0.6, 51.2],
+            [0.4, 51.8],
           ],
         });
 
@@ -344,15 +420,58 @@ nav {
   width: 100%;
   margin: 0;
   padding: 0;
+  position: relative; /* 为 legend 定位 */
 }
 
 .map-container {
   width: 100%;
-  height: 85vh; /* 🚀 原本70vh → 85vh，更占屏幕高度 */
+  height: 85vh;
   border: 5px solid #a855f7;
   box-shadow: 0 0 50px rgba(168, 85, 247, 0.6);
-  border-radius: 0; /* ✅ 让边界更贴合顶部导航 */
+  border-radius: 0;
   overflow: hidden;
+}
+
+/* Legend */
+.map-legend {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  padding: 10px 12px;
+  background: rgba(5, 5, 10, 0.96);
+  border: 1px solid #a855f7;
+  border-radius: 8px;
+  box-shadow: 0 0 16px rgba(168, 85, 247, 0.6);
+  font-size: 10px;
+  color: #e5e7eb;
+  z-index: 5;
+}
+
+.legend-title {
+  font-size: 10px;
+  margin-bottom: 4px;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.legend-note {
+  margin-top: 4px;
+  font-size: 8px;
+  color: #9ca3af;
 }
 
 /* Info Section */
