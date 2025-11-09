@@ -21,7 +21,7 @@
         </p>
       </div>
 
-      <!-- Map Container (Real Mapbox Map Replaces Placeholder) -->
+      <!-- Map Container -->
       <div class="map-container-wrapper">
         <div ref="mapContainer" class="map-container"></div>
       </div>
@@ -64,9 +64,9 @@
 
         <!-- CTA -->
         <div class="cta-container">
-          <router-link to="/page4" class="pixel-button"
-            >Support Our Research</router-link
-          >
+          <router-link to="/page4" class="pixel-button">
+            Support Our Research
+          </router-link>
         </div>
       </div>
     </div>
@@ -80,13 +80,17 @@ import { onMounted, onBeforeUnmount, onActivated, ref } from "vue";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
+const BOROUGH_SOURCE_ID = "london-boroughs";
+const BOROUGH_FILL_ID = "borough-fill";
+const BOROUGH_BORDER_GLOW_ID = "borough-border-glow";
+const LONDON_OUTER_GLOW_ID = "london-outer-glow";
+
 export default {
   setup() {
     const mapContainer = ref(null);
     let map = null;
 
     const resetScroll = () => {
-      // 通杀几种可能的滚动容器
       window.scrollTo(0, 0);
       document.body.scrollTop = 0;
       document.documentElement.scrollTop = 0;
@@ -94,13 +98,121 @@ export default {
       if (app) app.scrollTop = 0;
     };
 
+    // 随机颜色：后面可以用 pm2.5 替换掉这里
+    const randomColor = () => {
+      const hue = Math.floor(Math.random() * 360);
+      return `hsl(${hue}, 70%, 55%)`;
+    };
+
+    const addBoroughLayers = async () => {
+      try {
+        // 从 public 目录加载 GeoJSON
+        const res = await fetch("/london_boroughs.geojson");
+        const geojson = await res.json();
+
+        // 为每个 borough 添加随机颜色（后面可换成真实数据）
+        geojson.features = geojson.features.map((f) => {
+          f.properties = {
+            ...f.properties,
+            fillColor: randomColor(),
+          };
+          return f;
+        });
+
+        // 数据源
+        if (!map.getSource(BOROUGH_SOURCE_ID)) {
+          map.addSource(BOROUGH_SOURCE_ID, {
+            type: "geojson",
+            data: geojson,
+          });
+        } else {
+          map.getSource(BOROUGH_SOURCE_ID).setData(geojson);
+        }
+
+        // 1️⃣ Borough 填充
+        if (!map.getLayer(BOROUGH_FILL_ID)) {
+          map.addLayer({
+            id: BOROUGH_FILL_ID,
+            type: "fill",
+            source: BOROUGH_SOURCE_ID,
+            paint: {
+              "fill-color": ["get", "fillColor"],
+              "fill-opacity": 0.6,
+            },
+          });
+        }
+
+        // 2️⃣ 外圈 glow
+        if (!map.getLayer(LONDON_OUTER_GLOW_ID)) {
+          map.addLayer({
+            id: LONDON_OUTER_GLOW_ID,
+            type: "line",
+            source: BOROUGH_SOURCE_ID,
+            paint: {
+              "line-color": "#a855f7",
+              "line-width": 6,
+              "line-opacity": 0.22,
+            },
+          });
+        }
+
+        // 3️⃣ 内部边界亮线
+        if (!map.getLayer(BOROUGH_BORDER_GLOW_ID)) {
+          map.addLayer({
+            id: BOROUGH_BORDER_GLOW_ID,
+            type: "line",
+            source: BOROUGH_SOURCE_ID,
+            paint: {
+              "line-color": "#ffffff",
+              "line-width": 1.4,
+              "line-opacity": 0.9,
+            },
+          });
+        }
+
+        // 4️⃣ 自动缩放到包含所有 borough 的范围（关键部分）
+        const bounds = new mapboxgl.LngLatBounds();
+        geojson.features.forEach((f) => {
+          // 兼容 Polygon / MultiPolygon
+          const geom = f.geometry;
+          const coords =
+            geom.type === "Polygon"
+              ? geom.coordinates.flat()
+              : geom.coordinates.flat(2);
+
+          for (let i = 0; i < coords.length; i++) {
+            const [lng, lat] = coords[i];
+            bounds.extend([lng, lat]);
+          }
+        });
+
+        map.fitBounds(bounds, {
+          padding: 40,
+          maxZoom: 9.2, // 限制别太近，这样看得到全貌
+        });
+      } catch (err) {
+        console.error("❌ Failed to load london_boroughs.geojson", err);
+      }
+    };
+
     const initMap = () => {
       if (!map && mapContainer.value) {
         map = new mapboxgl.Map({
           container: mapContainer.value,
           style: "mapbox://styles/mapbox/standard",
-          center: [-0.12, 51.5], // London
+          center: [-0.1276, 51.5072],
           zoom: 9,
+          maxBounds: [
+            [-0.6, 51.2], // 西南角
+            [0.4, 51.8], // 东北角
+          ],
+        });
+
+        map.addControl(new mapboxgl.NavigationControl(), "top-right");
+
+        map.on("load", () => {
+          console.log("✅ London basemap loaded");
+          addBoroughLayers();
         });
       }
     };
@@ -110,7 +222,6 @@ export default {
       initMap();
     });
 
-    // 若使用 <keep-alive>，再次激活时也回到顶部
     onActivated(() => {
       resetScroll();
     });
@@ -230,18 +341,17 @@ nav {
 
 /* Map Container */
 .map-container-wrapper {
-  max-width: 1400px;
-  margin: 2rem auto;
-  padding: 0 2rem;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .map-container {
   width: 100%;
-  height: 70vh;
-  min-height: 500px;
-  border: 4px solid #a855f7;
-  box-shadow: 0 0 40px rgba(168, 85, 247, 0.5);
-  border-radius: 10px;
+  height: 85vh; /* 🚀 原本70vh → 85vh，更占屏幕高度 */
+  border: 5px solid #a855f7;
+  box-shadow: 0 0 50px rgba(168, 85, 247, 0.6);
+  border-radius: 0; /* ✅ 让边界更贴合顶部导航 */
   overflow: hidden;
 }
 
