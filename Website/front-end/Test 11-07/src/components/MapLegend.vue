@@ -10,25 +10,24 @@
 </template>
 
 <script setup>
-// defineProps 是 Vue 3 的组合式语法
 defineProps({
   title: {
     type: String,
-    default: "PM2.5 (µg/m³)",
+    default: "PM2.5 Emissions (g/hour)",
   },
   note: {
     type: String,
-    default: "* Displaying sample data",
+    default: "* Based on backend hourly emissions",
   },
   levels: {
     type: Array,
     default: () => [
-      { color: "#22c55e", label: "0 – 10 Excellent" },
-      { color: "#84cc16", label: "10 – 20 Good" },
-      { color: "#eab308", label: "20 – 30 Moderate" },
-      { color: "#f97316", label: "30 – 40 Unhealthy" },
-      { color: "#ef4444", label: "40 – 60 Very Unhealthy" },
-      { color: "#7f1d1d", label: "> 60 Hazardous" },
+      { color: "#22c55e", label: "0 – 200 Very Low" },
+      { color: "#84cc16", label: "200 – 260 Low" },
+      { color: "#eab308", label: "260 – 340 Moderate" },
+      { color: "#f97316", label: "340 – 430 High" },
+      { color: "#ef4444", label: "430 – 550 Very High" },
+      { color: "#7f1d1d", label: "> 550 Extreme" },
     ],
   },
 });

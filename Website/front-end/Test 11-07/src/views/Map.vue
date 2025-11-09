@@ -23,6 +23,11 @@
 
       <!-- Map Container -->
       <div class="map-container-wrapper">
+        <TimeSlider
+          :model-value="activeHour"
+          @update:modelValue="onHourChange"
+        />
+
         <div ref="mapContainer" class="map-container"></div>
         <MapLegend />
       </div>
@@ -82,6 +87,7 @@ import { ref, onMounted, onBeforeUnmount, onActivated, createApp } from "vue";
 import "../assets/styles/map.css";
 import MapLegend from "../components/MapLegend.vue";
 import BoroughPopup from "../components/BoroughPopup.vue";
+import TimeSlider from "../components/TimeSlider.vue";
 
 mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN;
 
@@ -91,56 +97,144 @@ const BOROUGH_BORDER_GLOW_ID = "borough-border-glow";
 const LONDON_OUTER_GLOW_ID = "london-outer-glow";
 const BOROUGH_LABEL_ID = "borough-labels";
 
-// For now: fixed hour (0–23). Later you can make this reactive with a time slider.
-const ACTIVE_HOUR = 12;
+const DEFAULT_HOUR = 0;
+
+const API_BASE_URL = "http://10.129.111.34:3000";
+
+const normalizeForBackend = (name) => {
+  return name
+    .toLowerCase()
+    .replace(/london borough of /g, "")
+    .replace(/royal borough of /g, "")
+    .replace(/city of /g, "")
+    .replace(/&/g, "and")
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
 
 export default {
-  components: { MapLegend },
+  components: {
+    MapLegend,
+    TimeSlider,
+  },
 
   setup() {
     const mapContainer = ref(null);
+    const activeHour = ref(DEFAULT_HOUR);
 
     let map = null;
-    let aqMap = null; // Map<boroughName, {pm25[], co[], co2[]}>
-    let baseGeojson = null; // original borough boundaries
-    let popup = null; // Mapbox Popup instance
-    let popupApp = null; // Vue app instance for BoroughPopup
+    let aqMap = null; // Map<normalizedBoroughName, { pm25, co, co2, vehicles }>
+    let baseGeojson = null;
+    let popup = null;
+    let popupApp = null;
 
     const resetScroll = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      }
+      if (typeof document !== "undefined") {
+        if (document.documentElement) {
+          document.documentElement.scrollTop = 0;
+          document.documentElement.scrollLeft = 0;
+        }
+        if (document.body) {
+          document.body.scrollTop = 0;
+          document.body.scrollLeft = 0;
+        }
+      }
     };
 
-    const getValueForHour = (arr) => {
-      if (!Array.isArray(arr) || arr.length === 0) return null;
-      return arr[ACTIVE_HOUR] ?? arr[0];
+    const fetchBackendDataForHour = async (hour) => {
+      if (!baseGeojson) return;
+
+      const normalizedNames = new Set();
+
+      baseGeojson.features.forEach((f) => {
+        const rawName =
+          f.properties.NAME ||
+          f.properties.BOROUGH ||
+          f.properties.LAD13NM ||
+          f.properties.name;
+
+        if (!rawName) return;
+        const norm = normalizeForBackend(rawName);
+        if (norm) normalizedNames.add(norm);
+      });
+
+      const results = await Promise.all(
+        Array.from(normalizedNames).map(async (normName) => {
+          const backendKey = `${normName}_${hour}`;
+          const url = `${API_BASE_URL}/api/hourly?borough=${encodeURIComponent(
+            backendKey
+          )}`;
+
+          try {
+            const res = await fetch(url);
+            if (!res.ok) {
+              console.warn(
+                `Failed to fetch data for ${normName}: ${res.status}`
+              );
+              return null;
+            }
+
+            const data = await res.json();
+
+            return {
+              normName,
+              pm25: data.pm25_g_per_h,
+              co: data.co_g_per_h,
+              co2: data.co2_kg_per_h,
+              vehicles: data.vehicles_per_hour,
+            };
+          } catch (err) {
+            console.error("Error fetching data for", normName, err);
+            return null;
+          }
+        })
+      );
+
+      aqMap = new Map();
+      results.forEach((item) => {
+        if (!item) return;
+        aqMap.set(item.normName, {
+          pm25: item.pm25,
+          co: item.co,
+          co2: item.co2,
+          vehicles: item.vehicles,
+        });
+      });
     };
 
-    // Build FeatureCollection with pm25/co/co2 for the current hour
     const buildStyledGeojson = () => {
       if (!baseGeojson || !aqMap) return null;
 
       return {
         type: "FeatureCollection",
         features: baseGeojson.features.map((f) => {
-          const name =
+          const rawName =
             f.properties.NAME ||
             f.properties.BOROUGH ||
             f.properties.LAD13NM ||
             f.properties.name;
 
-          const hourly = aqMap.get(name) || {};
-          const pm25 = getValueForHour(hourly.pm25);
-          const co = getValueForHour(hourly.co);
-          const co2 = getValueForHour(hourly.co2);
+          const normName = rawName ? normalizeForBackend(rawName) : null;
+          const metrics = normName ? aqMap.get(normName) || {} : {};
+
+          const pm25 = metrics.pm25 ?? null;
+          const co = metrics.co ?? null;
+          const co2 = metrics.co2 ?? null;
+          const vehicles = metrics.vehicles ?? null;
 
           return {
             ...f,
             properties: {
               ...f.properties,
-              BoroughName: name,
+              BoroughName: rawName || normName || "Unknown",
               pm25,
               co,
               co2,
+              vehicles,
             },
           };
         }),
@@ -149,22 +243,19 @@ export default {
 
     const addBoroughLayers = async () => {
       try {
-        // Load boundaries + test data from /public
-        const [geoRes, aqRes] = await Promise.all([
-          fetch("/london_boroughs.geojson"),
-          fetch("/borough_air_quality.json"),
-        ]);
+        if (!baseGeojson) {
+          const geoRes = await fetch("/london_boroughs.geojson");
+          baseGeojson = await geoRes.json();
+        }
 
-        const geojson = await geoRes.json();
-        const aq = await aqRes.json();
-
-        // Map borough -> hourly data
-        aqMap = new Map(aq.data.map((entry) => [entry.borough, entry.hourly]));
-        baseGeojson = geojson;
+        await fetchBackendDataForHour(activeHour.value);
 
         const styledGeojson = buildStyledGeojson();
+        if (!styledGeojson) {
+          console.error("No styledGeojson generated");
+          return;
+        }
 
-        // Data source
         if (!map.getSource(BOROUGH_SOURCE_ID)) {
           map.addSource(BOROUGH_SOURCE_ID, {
             type: "geojson",
@@ -174,7 +265,6 @@ export default {
           map.getSource(BOROUGH_SOURCE_ID).setData(styledGeojson);
         }
 
-        // Fill layer (color by pm2.5)
         if (!map.getLayer(BOROUGH_FILL_ID)) {
           map.addLayer({
             id: BOROUGH_FILL_ID,
@@ -187,15 +277,15 @@ export default {
                 ["get", "pm25"],
                 0,
                 "#22c55e",
-                10,
+                200,
                 "#84cc16",
-                20,
+                260,
                 "#eab308",
-                30,
+                340,
                 "#f97316",
-                40,
+                430,
                 "#ef4444",
-                60,
+                550,
                 "#7f1d1d",
               ],
               "fill-opacity": 0.78,
@@ -203,7 +293,6 @@ export default {
           });
         }
 
-        // Outer glow
         if (!map.getLayer(LONDON_OUTER_GLOW_ID)) {
           map.addLayer({
             id: LONDON_OUTER_GLOW_ID,
@@ -217,7 +306,6 @@ export default {
           });
         }
 
-        // Borough borders
         if (!map.getLayer(BOROUGH_BORDER_GLOW_ID)) {
           map.addLayer({
             id: BOROUGH_BORDER_GLOW_ID,
@@ -231,7 +319,6 @@ export default {
           });
         }
 
-        // Borough labels
         if (!map.getLayer(BOROUGH_LABEL_ID)) {
           map.addLayer({
             id: BOROUGH_LABEL_ID,
@@ -258,7 +345,6 @@ export default {
           });
         }
 
-        // Fit to all boroughs
         const bounds = new mapboxgl.LngLatBounds();
         styledGeojson.features.forEach((f) => {
           const geom = f.geometry;
@@ -271,22 +357,20 @@ export default {
 
         map.fitBounds(bounds, { padding: 40, maxZoom: 9.2 });
 
-        // Hover cursor
         map.on("mouseenter", BOROUGH_FILL_ID, () => {
           map.getCanvas().style.cursor = "pointer";
         });
-        map.on("mouseleave", BOROUGH_FILL_ID, () => {
+        map.on("mouseleave", () => {
           map.getCanvas().style.cursor = "";
         });
 
-        // Click: show Vue-based popup with 3 metrics + chart
         map.on("click", BOROUGH_FILL_ID, (e) => {
           if (!e.features || !e.features.length) return;
 
           const feature = e.features[0];
           const props = feature.properties || {};
 
-          const name =
+          const rawName =
             props.BoroughName ||
             props.NAME ||
             props.BOROUGH ||
@@ -294,26 +378,26 @@ export default {
             props.name ||
             "Unknown borough";
 
-          const hourly = (aqMap && aqMap.get(name)) || {
-            pm25: [],
-            co: [],
-            co2: [],
-          };
+          const normName = normalizeForBackend(rawName);
+          const metrics = (aqMap && aqMap.get(normName)) || {};
 
           const pm25 =
             props.pm25 !== undefined && props.pm25 !== null
               ? Number(props.pm25)
-              : getValueForHour(hourly.pm25);
+              : metrics.pm25 ?? null;
           const co =
             props.co !== undefined && props.co !== null
               ? Number(props.co)
-              : getValueForHour(hourly.co);
+              : metrics.co ?? null;
           const co2 =
             props.co2 !== undefined && props.co2 !== null
               ? Number(props.co2)
-              : getValueForHour(hourly.co2);
+              : metrics.co2 ?? null;
+          const vehicles =
+            props.vehicles !== undefined && props.vehicles !== null
+              ? Number(props.vehicles)
+              : metrics.vehicles ?? null;
 
-          // Clean up previous popup & app
           if (popup) {
             popup.remove();
             popup = null;
@@ -323,15 +407,15 @@ export default {
             popupApp = null;
           }
 
-          // Mount BoroughPopup.vue into a DOM node
           const container = document.createElement("div");
           popupApp = createApp(BoroughPopup, {
-            name,
-            hour: ACTIVE_HOUR,
+            name: rawName,
+            hour: activeHour.value,
             pm25,
             co,
             co2,
-            hourly,
+            vehicles,
+            hourly: null,
           });
           popupApp.mount(container);
 
@@ -339,7 +423,6 @@ export default {
             closeButton: true,
             closeOnClick: false,
             offset: 16,
-            //maxWidth: "340px",
           })
             .setLngLat(e.lngLat)
             .setDOMContent(container)
@@ -354,8 +437,37 @@ export default {
           });
         });
       } catch (err) {
-        console.error("Failed to load map or air quality data", err);
+        console.error("Failed to load map or backend data", err);
       }
+    };
+
+    const updateMapForHour = async (hour) => {
+      if (!baseGeojson || !map) return;
+
+      await fetchBackendDataForHour(hour);
+
+      const styledGeojson = buildStyledGeojson();
+      if (!styledGeojson) return;
+
+      const source = map.getSource(BOROUGH_SOURCE_ID);
+      if (source) {
+        source.setData(styledGeojson);
+      }
+
+      if (popup) {
+        popup.remove();
+        popup = null;
+      }
+      if (popupApp) {
+        popupApp.unmount();
+        popupApp = null;
+      }
+    };
+
+    const onHourChange = async (newHour) => {
+      if (newHour === activeHour.value) return;
+      activeHour.value = newHour;
+      await updateMapForHour(newHour);
     };
 
     const initMap = () => {
@@ -403,7 +515,11 @@ export default {
       }
     });
 
-    return { mapContainer };
+    return {
+      mapContainer,
+      activeHour,
+      onHourChange,
+    };
   },
 };
 </script>

@@ -4,7 +4,7 @@
     <div class="bp-header">
       <div class="bp-label">AIR QUALITY SNAPSHOT</div>
       <div class="bp-title">{{ name }}</div>
-      <div class="bp-subtitle">Hour {{ hour }}:00 · Sample data</div>
+      <div class="bp-subtitle">Hour {{ hour }}:00 · Backend hourly data</div>
     </div>
 
     <!-- Metrics row -->
@@ -13,19 +13,31 @@
         <div class="bp-metric-label">PM2.5</div>
         <div class="bp-metric-value">
           {{ format(pm25) }}
-          <span class="unit">µg/m³</span>
+          <span class="unit">g/hour</span>
         </div>
       </div>
+
       <div class="bp-metric">
         <div class="bp-metric-label">CO</div>
         <div class="bp-metric-value">
-          {{ format(co) }} <span class="unit">ppm</span>
+          {{ format(co) }}
+          <span class="unit">g/hour</span>
         </div>
       </div>
+
       <div class="bp-metric">
         <div class="bp-metric-label">CO₂</div>
         <div class="bp-metric-value">
-          {{ format(co2) }} <span class="unit">ppm</span>
+          {{ format(co2) }}
+          <span class="unit">kg/hour</span>
+        </div>
+      </div>
+
+      <div class="bp-metric traffic">
+        <div class="bp-metric-label">Traffic Volume</div>
+        <div class="bp-metric-value">
+          {{ formatInt(vehicles) }}
+          <span class="unit">vehicles/hour</span>
         </div>
       </div>
     </div>
@@ -35,8 +47,8 @@
 
     <!-- Chart -->
     <div class="bp-chart-header">
-      <span>24h PM2.5 trend</span>
-      <span class="bp-chart-hint">mock data · lower is better</span>
+      <span>24h PM2.5 trend (g/hour)</span>
+      <span class="bp-chart-hint"> live from backend · lower is better </span>
     </div>
     <div class="bp-chart-wrap">
       <canvas ref="chartCanvas"></canvas>
@@ -48,42 +60,92 @@
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import { Chart } from "chart.js/auto";
 
+const API_BASE_URL = "http://10.129.111.34:3000";
+
 const props = defineProps({
   name: { type: String, required: true },
   hour: { type: Number, required: true },
   pm25: { type: Number, default: null },
   co: { type: Number, default: null },
   co2: { type: Number, default: null },
-  // { pm25: number[], co: number[], co2: number[] }
-  hourly: {
-    type: Object,
-    default: () => ({ pm25: [], co: [], co2: [] }),
-  },
+  vehicles: { type: Number, default: null },
 });
 
 const chartCanvas = ref(null);
 let chartInstance = null;
+
+const hourlyPm25 = ref(Array(24).fill(null));
 
 const format = (v) => {
   if (v === null || v === undefined || Number.isNaN(v)) return "N/A";
   return Number(v).toFixed(1);
 };
 
+const formatInt = (v) => {
+  if (v === null || v === undefined || Number.isNaN(v)) return "N/A";
+  return Math.round(Number(v)).toLocaleString();
+};
+
+const normalizeForBackend = (name) => {
+  if (!name) return "";
+  return name
+    .toLowerCase()
+    .replace(/london borough of /g, "")
+    .replace(/royal borough of /g, "")
+    .replace(/city of /g, "")
+    .replace(/&/g, "and")
+    .replace(/\./g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+};
+
+// 拉取 24 小时 pm2.5 数据：borough=<norm>_<hour>
+const fetchPm25Trend = async () => {
+  const norm = normalizeForBackend(props.name);
+  if (!norm) return;
+
+  const values = [];
+
+  for (let h = 0; h < 24; h++) {
+    const key = `${norm}_${h}`;
+    const url = `${API_BASE_URL}/api/hourly?borough=${encodeURIComponent(key)}`;
+
+    try {
+      const res = await fetch(url);
+      if (!res.ok) {
+        values.push(null);
+        continue;
+      }
+      const data = await res.json();
+      values.push(
+        data && data.pm25_g_per_h !== undefined
+          ? Number(data.pm25_g_per_h)
+          : null
+      );
+    } catch (err) {
+      console.error("Failed to fetch hourly pm25 for", key, err);
+      values.push(null);
+    }
+  }
+
+  hourlyPm25.value = values;
+};
+
 const buildChart = () => {
   const el = chartCanvas.value;
   if (!el) return;
 
-  const src = Array.isArray(props.hourly.pm25) ? props.hourly.pm25 : [];
+  const src = Array.isArray(hourlyPm25.value) ? hourlyPm25.value : [];
   const labels = Array.from({ length: 24 }, (_, i) => i);
 
-  // 保证有 24 个点，不足补 null，多了截断
   const data = labels.map((i) => {
     const raw = src[i];
-    if (raw === null || raw === undefined || Number.isNaN(raw)) return null;
+    if (raw === null || raw === undefined || Number.isNaN(raw)) {
+      return null;
+    }
     return Number(raw);
   });
 
-  // 如果全是 null，就不画，避免难看一条线
   if (!data.some((v) => v !== null)) {
     if (chartInstance) {
       chartInstance.destroy();
@@ -124,7 +186,7 @@ const buildChart = () => {
           displayColors: false,
           callbacks: {
             title: (items) => `Hour ${items[0].label}:00`,
-            label: (ctx) => `PM2.5: ${format(ctx.parsed.y)} µg/m³`,
+            label: (ctx) => `PM2.5: ${format(ctx.parsed.y)} g/hour`,
           },
         },
       },
@@ -152,12 +214,17 @@ const buildChart = () => {
   });
 };
 
-onMounted(buildChart);
+onMounted(async () => {
+  await fetchPm25Trend();
+  buildChart();
+});
 
 watch(
-  () => props.hourly,
-  () => buildChart(),
-  { deep: true }
+  () => props.name,
+  async () => {
+    await fetchPm25Trend();
+    buildChart();
+  }
 );
 
 onBeforeUnmount(() => {
@@ -170,33 +237,33 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .bp-card {
-  width: 300px;
-  height: 250px;
-  padding: 10px 12px 9px;
+  width: 480px; /* 原 320 ×1.5 */
+  height: 405px; /* 原 270 ×1.5 */
+  padding: 15px 18px 14px;
   background: radial-gradient(
       circle at top,
       rgba(168, 85, 247, 0.16),
       transparent
     ),
     rgba(5, 5, 12, 0.98);
-  border-radius: 14px;
+  border-radius: 21px;
   border: 1px solid rgba(168, 85, 247, 0.9);
-  box-shadow: 0 0 24px rgba(168, 85, 247, 0.45);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 0 36px rgba(168, 85, 247, 0.45);
+  backdrop-filter: blur(10px);
   color: #e5e7eb;
   box-sizing: border-box;
 }
 
 .bp-header {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .bp-label {
   display: inline-flex;
-  padding: 2px 6px;
+  padding: 3px 9px;
   border-radius: 999px;
   border: 1px solid rgba(168, 85, 247, 0.6);
-  font-size: 7px;
+  font-size: 10.5px;
   letter-spacing: 0.12em;
   color: #a855f7;
 }
@@ -204,56 +271,60 @@ onBeforeUnmount(() => {
 .bp-title {
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
-  font-size: 14px;
+  font-size: 21px;
   letter-spacing: 0.5px;
   color: #f3f4f6;
 }
 
 .bp-subtitle {
-  margin-top: 1px;
-  font-size: 8px;
+  margin-top: 2px;
+  font-size: 12px;
   color: #9ca3af;
 }
 
 .bp-metrics {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 6px;
-  margin-top: 6px;
+  gap: 9px;
+  margin-top: 9px;
+}
+
+.bp-metric.traffic {
+  grid-column: span 3;
 }
 
 .bp-metric {
-  padding: 4px 4px 3px;
-  border-radius: 6px;
+  padding: 6px 6px 5px;
+  border-radius: 9px;
   background: rgba(10, 10, 18, 0.98);
   border: 1px solid rgba(148, 163, 253, 0.14);
 }
 
 .bp-metric.highlight {
   border-color: #22c55e;
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.35);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.35);
 }
 
 .bp-metric-label {
-  font-size: 7px;
+  font-size: 10.5px;
   color: #9ca3af;
 }
 
 .bp-metric-value {
-  font-size: 10px;
+  font-size: 15px;
   font-weight: 600;
-  line-height: 1.15;
+  line-height: 1.2;
 }
 
 .bp-metric-value .unit {
-  margin-left: 2px;
-  font-size: 7px;
+  margin-left: 3px;
+  font-size: 10.5px;
   color: #9ca3af;
 }
 
 .bp-divider {
-  margin: 6px 0 4px;
-  height: 1px;
+  margin: 9px 0 6px;
+  height: 1.5px;
   background: linear-gradient(
     to right,
     transparent,
@@ -266,18 +337,18 @@ onBeforeUnmount(() => {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  font-size: 7px;
+  font-size: 10.5px;
   color: #9ca3af;
-  margin-bottom: 2px;
+  margin-bottom: 3px;
 }
 
 .bp-chart-hint {
-  font-size: 6px;
+  font-size: 9px;
   color: #6b7280;
 }
 
 .bp-chart-wrap {
   width: 100%;
-  height: 60px;
+  height: 120px; /* 原 80×1.5 */
 }
 </style>
