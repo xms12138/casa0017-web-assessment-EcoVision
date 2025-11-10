@@ -7,7 +7,6 @@
       <div class="bp-subtitle">Hour {{ hour }}:00 · Backend hourly data</div>
     </div>
 
-    <!-- Metrics row -->
     <div class="bp-metrics">
       <div class="bp-metric highlight">
         <div class="bp-metric-label">PM2.5</div>
