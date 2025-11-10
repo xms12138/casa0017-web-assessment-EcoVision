@@ -113,11 +113,17 @@ const BUSIEST_SOURCE_ID = "busiest-streets";
 const BUSIEST_LINE_ID = "busiest-streets-line";
 
 const DEFAULT_HOUR = 0;
-const API_BASE_URL = "http://10.129.111.34:3000";
+const API_BASE_URL = "http://10.129.111.25:3000";
 
-const normalizeForBackend = (name) =>
-  name
-    .toLowerCase()
+const normalizeForBackend = (name) => {
+  const lower = name.toLowerCase().trim();
+
+  if (lower === "city of london") {
+    // 和你的 CSV / 后端 key 保持一致
+    return "city of london";
+  }
+
+  return lower
     .replace(/london borough of /g, "")
     .replace(/royal borough of /g, "")
     .replace(/city of /g, "")
@@ -125,6 +131,7 @@ const normalizeForBackend = (name) =>
     .replace(/\./g, "")
     .replace(/\s+/g, " ")
     .trim();
+};
 
 // 粗略计算线段方向，用于设置 bearing
 const computeBearing = (start, end) => {

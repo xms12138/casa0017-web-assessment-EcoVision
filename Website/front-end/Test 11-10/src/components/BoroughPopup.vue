@@ -69,7 +69,7 @@
 import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import { Chart } from "chart.js/auto";
 
-const API_BASE_URL = "http://10.129.111.34:3000";
+const API_BASE_URL = "http://10.129.111.25:3000";
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -101,9 +101,14 @@ const formatInt = (v) => {
 };
 
 const normalizeForBackend = (name) => {
-  if (!name) return "";
-  return name
-    .toLowerCase()
+  const lower = name.toLowerCase().trim();
+
+  if (lower === "city of london") {
+    // 和你的 CSV / 后端 key 保持一致
+    return "city of london";
+  }
+
+  return lower
     .replace(/london borough of /g, "")
     .replace(/royal borough of /g, "")
     .replace(/city of /g, "")
