@@ -7,11 +7,11 @@
     "preview": "vite preview",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist -b gh-pages -r https://github.com/xms12138/casa0017-web-assessment-EcoVision.git"
-
   },
   "dependencies": {
     "@mapbox/mapbox-gl-draw": "^1.5.1",
     "chart.js": "^4.5.1",
+    "echarts": "^6.0.0",
     "mapbox-gl": "^3.16.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4"
