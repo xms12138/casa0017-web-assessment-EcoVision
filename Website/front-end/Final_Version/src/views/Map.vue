@@ -527,7 +527,6 @@ export default {
             vehicles,
             hasBusiestStreet: hasBusiest,
             onViewStreet: () => {
-              // 关闭 borough popup，进入路线视角
               if (popup) {
                 popup.remove();
                 popup = null;
@@ -654,7 +653,6 @@ export default {
       }
     };
 
-    // 显示路线 popup（放在路的尽头，一直可重复打开）
     const showRoutePopup = async (normBoroughName) => {
       if (!map || !busiestStreetByBorough) return;
 
@@ -696,7 +694,6 @@ export default {
         ? Number(data.per_car_pm25_g_per_h)
         : null;
 
-      // 确保每次是干净状态
       closeRoutePopup();
 
       const container = document.createElement("div");
@@ -711,7 +708,6 @@ export default {
       });
       routePopupApp.mount(container);
 
-      // 路的尽头
       let anchorLngLat;
       if (info.coords && info.coords.length > 0) {
         const last = info.coords[info.coords.length - 1];
@@ -735,12 +731,10 @@ export default {
         .setDOMContent(container)
         .addTo(map);
 
-      // 绑定一次 close 事件
       routePopupCloseHandler = onRoutePopupClose;
       routePopup.on("close", routePopupCloseHandler);
     };
 
-    // 飞到 busiest street + 打开 route popup
     const flyToBusiestStreet = async (normBoroughName) => {
       if (!map || !busiestStreetByBorough) return;
       const info = busiestStreetByBorough.get(normBoroughName);
@@ -748,7 +742,6 @@ export default {
 
       const { center, bearing, bounds } = info;
 
-      // 记录进入之前的视角（只记录第一次进入）
       if (!isStreetViewActive.value) {
         previousViewState.value = {
           center: map.getCenter(),
