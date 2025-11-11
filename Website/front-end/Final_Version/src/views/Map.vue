@@ -45,18 +45,20 @@
       <div class="map-info">
         <div class="info-grid">
           <div class="info-card">
-            <h3>Historical Data</h3>
+            <h3>Interactive Map</h3>
             <p>
-              Access previous month's air quality data to identify patterns and
-              trends across London boroughs.
+              Explore all 33 boroughs of London through an interactive 3D map
+              built with Mapbox. Each region responds dynamically to real-time
+              environmental data.
             </p>
           </div>
 
           <div class="info-card">
-            <h3>Interactive Features</h3>
+            <h3>Visualization</h3>
             <p>
-              Zoom, pan, and click on boroughs to see detailed air quality
-              metrics and pollution sources.
+              Observe color-coded pollution levels across boroughs. The
+              intensity of each shade reflects PM2.5 concentration, helping
+              users instantly grasp air quality variations.
             </p>
           </div>
 
@@ -69,10 +71,27 @@
           </div>
 
           <div class="info-card">
-            <h3>Data Sources</h3>
+            <h3>Smart Popup Panel</h3>
             <p>
-              Powered by the London Air Quality Network and TfL open datasets
-              for accurate, reliable information.
+              Click on any borough to open an info panel showing live air
+              metrics, key statistics, and visual charts for a clearer
+              understanding of trends.
+            </p>
+          </div>
+          <div class="info-card">
+            <h3>Street View Mode</h3>
+            <p>
+              Dive into the busiest road in each borough. The map smoothly
+              transitions into a 3D view, revealing travel times, emission
+              levels, and transport comparisons.
+            </p>
+          </div>
+          <div class="info-card">
+            <h3>Dynamic Data</h3>
+            <p>
+              Behind the scenes, the system connects with a Node.js backend to
+              fetch live PM2.5 readings and update every color and chart in real
+              time.
             </p>
           </div>
         </div>

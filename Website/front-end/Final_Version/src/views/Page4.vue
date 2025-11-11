@@ -56,7 +56,7 @@
           <div class="team-members-grid">
             <div class="member-card">
               <div class="member-avatar">
-                <span class="avatar-emoji">🧑‍🎓</span>
+                <span class="avatar-emoji">👩‍💼</span>
               </div>
               <h3 class="member-name">Madina Diallo</h3>
               <p class="member-title">Project & Data Integration Lead</p>
@@ -68,7 +68,7 @@
 
             <div class="member-card">
               <div class="member-avatar">
-                <span class="avatar-emoji">🧑‍💻</span>
+                <span class="avatar-emoji">💻</span>
               </div>
               <h3 class="member-name">Matilda Nelson</h3>
               <p class="member-title">Research & Web Content Lead</p>
@@ -80,13 +80,14 @@
 
             <div class="member-card">
               <div class="member-avatar">
-                <span class="avatar-emoji">🎨</span>
+                <span class="avatar-emoji">🖥️</span>
               </div>
-              <h3 class="member-name">Vidan Gao</h3>
-              <p class="member-title">Design & Visualisation Lead</p>
+              <h3 class="member-name">Yidan Gao</h3>
+              <p class="member-title">Webpage & Visualisation Lead</p>
               <p class="member-description">
-                Creating intuitive visual designs and interactive data
-                visualizations for the London borough mapping system.
+                Designing and building the website framework and interface,
+                developing interactive flows and front-end logic, and performing
+                testing.
               </p>
             </div>
 
@@ -107,10 +108,13 @@
                 <span class="avatar-emoji">▶️</span>
               </div>
               <h3 class="member-name">Qingshan Luo</h3>
-              <p class="member-title">Testing & Editing Lead</p>
+              <p class="member-title">
+                Backend Development & Data Collection and Processing
+              </p>
               <p class="member-description">
-                Ensuring quality assurance, user testing, and content editing
-                for optimal user experience and accuracy.
+                Data collection, data classification and processing, MySQL
+                database setup, backend development, backend server setup, API
+                testing
               </p>
             </div>
           </div>
