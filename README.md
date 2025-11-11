@@ -10,7 +10,25 @@ Our mission is to **translate complex environmental data into clear, engaging, a
 
 We combine **data, design, and digital storytelling** to reveal the invisible patterns shaping our cities — from emissions and mobility to air quality and green space.
 
-## 
+
+
+## 🎥 Map Tutorial Video
+
+You can watch our tutorial video to learn how to interact with the **EcoVision Interactive London Map**.
+
+[▶️ Click to Watch the Tutorial Video](https://github.com/xms12138/casa0017-web-assessment-EcoVision/releases/download/v1.0/Video_Tutorial.mp4)
+
+This video demonstrates:
+
+- Exploring different London boroughs and viewing real-time air quality data  
+- Using the **time slider** to switch between hours of the day  
+- Interpreting the **map legend** and understanding color gradients  
+- Viewing detailed borough information through **popup panels**  
+- Navigating between map layers and 3D visualization modes  
+
+This tutorial helps users understand how to effectively use the EcoVision map to explore London's environmental data interactively.
+
+
 
 ## 🗺️ How to Use Our Map
 
