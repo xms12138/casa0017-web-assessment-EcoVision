@@ -1,61 +1,69 @@
----
-title: "CASA0017: Web Architecture Final Assessment"
-author: "EcoVision Team – Madina Diallo, Matilda Nelson, Qingshan Luo, Yidan Gao, Zihang He"
-date: "November 2025"
----
+# EcoVision Synergy: Mapping London’s Air Quality and Vehicle Emissions  
 
-# 🌿 EcoVision Synergy: Mapping London’s Air Quality and Vehicle Emissions  
+<p align="center">
+  <img src="./assets/logos/ecovision-logo.png" alt="EcoVision Team Logo" width="220"/>
+</p>
+
+---
 
 ## Abstract  
 
-**EcoVision Synergy** is an interactive web-based visualisation platform that explores the relationship between **vehicle-related CO₂/NO₂ emissions** and **traffic patterns** across London’s 33 boroughs.  
+**EcoVision Synergy** is an interactive web-based visualisation platform that explores the relationship between vehicle-related CO₂/NO₂ emissions and traffic patterns across London’s 33 boroughs.  
 
-The project transforms complex environmental data into an **accessible, engaging, and actionable experience** for the public. Through intuitive design, users can visualise hourly air-quality fluctuations and understand how urban mobility influences pollution levels.  
+The project transforms complex environmental data into an accessible, engaging, and actionable experience for the public. Through intuitive design, users can visualise hourly air-quality fluctuations and understand how urban mobility influences pollution levels.  
 
-By merging **open data, spatial mapping, and interactive storytelling**, EcoVision empowers Londoners to make informed travel choices, advocate for sustainable policies, and appreciate how technology can translate data into environmental insight.  
+By merging open data, spatial mapping, and interactive storytelling, EcoVision empowers Londoners to make informed travel choices, advocate for sustainable policies, and appreciate how technology can translate data into environmental insight.  
 
 ---
 
 ## Introduction  
 
 ### Background and Context  
-Air pollution remains one of London’s most serious environmental and public health challenges. With rising urban density, heavy vehicle usage, and unequal green-space distribution, CO₂ and NO₂ levels continue to threaten both the city’s ecology and human wellbeing.  
+Air pollution remains one of London’s most pressing environmental and public health challenges. According to the **London Atmospheric Emissions Inventory (GLA, 2023)**, road transport contributes nearly half of the city’s nitrogen oxide emissions. Despite vast open datasets from **DEFRA**, **TfL**, and the **London Datastore**, these are often fragmented or inaccessible to the general public.  
 
-Despite the abundance of open environmental data, much of it exists in **technical dashboards or static reports** inaccessible to most citizens. Our project reimagines this data through a **visual narrative**, allowing anyone to explore and interpret London’s air quality interactively.  
+**EcoVision Synergy** was created to bridge this gap — transforming complex emissions data into an interactive story that visualises how CO₂, NO₂, and PM₂.₅ fluctuate across boroughs throughout a 24-hour cycle.  
 
 ### Project Aim  
-EcoVision Synergy’s mission is to create a **dynamic, data-driven platform** that helps users:  
+EcoVision’s mission is to create a dynamic, data-driven platform that helps users:  
+
 - Visualise hourly CO₂ and NO₂ emission levels across boroughs  
 - Understand how traffic density correlates with air quality  
-- Explore how time of day impacts emissions  
+- Explore how time of day impacts pollution levels  
 - Discover practical solutions for individuals, communities, and policymakers  
 
-### Key Features  
-- 🗺️ **Interactive London Borough Map:** Clickable polygons representing each borough with embedded air-quality data.  
-- ⏱️ **Time Slider Functionality:** Allows exploration of hourly pollution trends over a 24-hour cycle.  
-- 🌈 **Colour-Coded Emissions:** Red, yellow, and green gradients show pollution intensity.  
-- 💡 **Embedded Solutions:** Offers tailored recommendations encouraging cleaner travel, behavioural change, and community action.  
-- 🌍 **3D Globe Mode:** A supplementary view that visualises data globally, built using Globe.GL.  
+---
 
-### Methodology  
-We integrated **open-source environmental and mobility datasets** from:  
-- London Air Quality Network (LAQN)  
-- Transport for London (TfL) traffic and congestion statistics  
-- National Atmospheric Emissions Inventory (NAEI)  
-- Supplementary Google Maps and DEFRA data  
+## Key Features  
 
-Data cleaning and transformation were performed using **Python**, with visualisation layers built in **JavaScript**.  
+🗺️ **Interactive London Borough Map:** Clickable polygons representing each borough with embedded air-quality and traffic data.  
+⏱️ **Time Slider Functionality:** Explore hourly pollution trends across a 24-hour period.  
+🌈 **Colour-Coded Emissions:** Red, yellow, and green gradients show pollution intensity.  
+💡 **Embedded Solutions:** Offers tailored recommendations for cleaner travel, behavioural change, and community action.  
+🌍 **3D Globe Mode:** Uses **Globe.GL** to visualise global emissions contextually.  
 
-**Core technologies used:**  
-- **Leaflet.js** – interactive mapping  
-- **D3.js** – data visualisation and scaling  
-- **Globe.GL** – 3D representation  
-- **MySQL** – backend data storage  
-- **HTML5, CSS3, JavaScript (ES6)** – front-end design and functionality  
-- **Node.js** – server logic and API connections  
-- **GitHub Pages** – version control and hosting  
+---
 
-Our design philosophy focused on **clarity, accessibility, and engagement**, ensuring the site communicates both data accuracy and visual storytelling.  
+## Methodology  
+
+Data integration was achieved using open-source environmental and mobility datasets from:  
+
+- **London Air Quality Network (LAQN)**  
+- **Transport for London (TfL)** – traffic and congestion statistics  
+- **National Atmospheric Emissions Inventory (NAEI)**  
+- **DEFRA** and **Google Maps**  
+
+Data was cleaned and transformed using **Python**, with visualisation layers developed in **JavaScript** and **Vue 3**.  
+
+**Core Technologies:**  
+- Leaflet.js – Interactive mapping  
+- D3.js – Data visualisation and scaling  
+- Globe.GL – 3D visualisation  
+- MySQL – Backend data management  
+- Node.js + Express – API connections  
+- HTML5, CSS3, JavaScript (ES6) – Frontend design  
+- GitHub Pages – Version control and hosting  
+
+Our design prioritised **clarity, accessibility, and engagement**, ensuring the site communicates both data accuracy and storytelling impact.  
 
 ---
 
@@ -63,92 +71,99 @@ Our design philosophy focused on **clarity, accessibility, and engagement**, ens
 
 ### Team Structure  
 
-**Meet the Team**  
+#### **Madina Diallo – Project Manager & Data Integration Lead**  
+Madina led the project from concept to delivery, ensuring alignment with scope, schedule, and quality. She coordinated sprints, GitHub version control, and documentation, verifying data accuracy and cohesion between backend and frontend teams. Her leadership ensured smooth collaboration and a coherent final product.  
 
-- **Madina Diallo – Project Manager & Data Integration Lead**  
-Madina brings the vision to delivery. She ensures the project stays aligned with scope, timeline, and quality, facilitating weekly sprints, coordinating GitHub workflows, and keeping the team synced. Her focus is on ensuring every dataset, visualisation, and line of code serves the broader mission. She also integrated datasets, maintained narrative cohesion, and oversaw presentation and repository documentation.  
+#### **Matilda Nelson – Data & Content Lead**  
+Matilda sourced and processed environmental datasets from DEFRA, TfL, and the London Datastore. She designed the “Solutions” section, transforming static references into actionable, data-driven insights linking emissions data to user-friendly recommendations.  
 
-- **Matilda Nelson – Data & Content Lead**  
-Matilda is our data detective and storyteller. She sourced emissions, traffic, and mode-use datasets from the London Datastore, DEFRA, and TfL, documented how each dataset feeds the platform, and guided early sketching workshops to align team vision. She ensures the **“Solutions”** page is meaningful — not just a list of resources but a data-driven call to action.  
+#### **Yidan Gao – UX & Visualisation Lead**  
+Yidan designed the user journey and interface, creating prototypes with **Miro** and **Canva** before implementing them in **Vue 3**. She developed a clear navigation flow from homepage to map exploration and ensured accessibility (WCAG 2.1 compliance) across devices.  
 
-- **Yidan Gao – UX & Visualisation Lead**  
-Yidan designed the user journey — from homepage flow to map interaction and solution discovery. Using **Miro** and wireframes, she mapped how users explore the interface, visualising how data transitions through the slider and pop-ups. Her accessibility-first mindset ensures inclusivity across devices and browsers.  
+#### **Zihang He – Frontend & Interactivity Lead**  
+Zihang implemented the interactive map and 3D globe using **Vue 3**, **Vite**, and **Mapbox GL JS**. He engineered modular components (TimeSlider, MapLegend, BoroughPopup) and optimised performance for smooth visual transitions and real-time responsiveness.  
 
-- **Zihang He – Frontend & Interactivity Lead**  
-Zihang built the bridge between data and experience. Using **HTML5, CSS3, JavaScript (ES6), Leaflet.js, and Globe.GL**, he developed the interactive map, the 3D globe, and smooth slider transitions. His code connects to live APIs, ensuring the experience remains responsive, dynamic, and visually rich.  
-
-- **Qingshan Luo – Backend & Data Engineering Lead**  
-Qingshan built the engine behind the platform. He gathered emissions data from the **NAEI**, estimated transport-based emissions via **Google Maps**, structured datasets in **MySQL**, and developed two RESTful APIs that allow real-time fetching of CO₂, NO₂, PM₂.₅, and travel-time comparisons. His robust backend enables seamless interaction between frontend visuals and live data sources.  
+#### **Qingshan Luo – Backend & Data Engineering Lead**  
+Qingshan developed two RESTful APIs powering real-time borough-level visualisations. He structured emissions and traffic datasets in **MySQL**, created efficient **Node.js/Express** routes, and connected Python-processed emissions data with live frontend requests.  
 
 ---
 
-### Workflow  
+## Workflow  
 
-The EcoVision team followed a **four-week Agile structure**:  
-1. **Week 1:** Research, data selection, and conceptual sketching  
-2. **Week 2:** Interface design and prototype development  
-3. **Week 3:** Backend integration, API development, and data linking  
-4. **Week 4:** Testing, refinement, accessibility review, and deployment  
+The project followed a **four-week Agile sprint** structure:  
 
-We tracked progress via **Microsoft Teams**, shared documentation, and GitHub commits. Each sprint included review sessions to maintain scope control and ensure all visual and functional elements aligned with our vision.  
+| Week | Key Activities | Deliverables |
+|------|----------------|--------------|
+| **1** | Research, data discovery, and storyboarding | Storyboard and initial data sources |
+| **2** | Backend setup and UI wireframes | Cleaned datasets and prototype |
+| **3** | Development of interactivity and API testing | Interactive map and time slider |
+| **4** | Final testing, accessibility review, and deployment | Live website and report |
+
+Collaboration tools included **Microsoft Teams**, **GitHub**, and **Google Drive**, ensuring version control, sprint transparency, and rapid iteration.  
 
 ---
 
 ## Results  
 
-The final platform offers:  
-- A **fluid, interactive user experience**, allowing users to visualise pollution levels hour by hour.  
-- **API-driven live updates** connecting traffic and air-quality data in real time.  
-- A **3D global visualisation** that situates London’s emissions within a broader environmental context.  
-- **Action-oriented recommendations**, encouraging individuals, communities, and policymakers to take steps toward cleaner transport and urban living.  
+The final platform delivers:  
+- Real-time API-driven data visualisation  
+- Hourly CO₂, NO₂, and PM₂.₅ mapping across 33 boroughs  
+- Dynamic 3D global context view  
+- Actionable insights for sustainable urban mobility  
 
-User testing confirmed that participants found the **time-slider and colour-coding** intuitive and appreciated how the map turned abstract data into tangible insights.  
+**User testing** confirmed the map’s intuitiveness and praised the clarity of its time slider and visual cues. Participants appreciated how EcoVision translated complex data into meaningful environmental insight.  
 
 ---
 
 ## Reflection  
 
-Building EcoVision Synergy taught the team the power of **collaboration across disciplines** — blending coding, data science, and design to turn information into meaning.  
+The EcoVision project showcased the power of **collaborative, interdisciplinary work** — blending environmental research, data engineering, and UX design.  
 
-Key lessons included:  
-- The challenge of aligning multi-source datasets and time intervals.  
-- The importance of **API optimisation** for smooth user interaction.  
-- The value of **simplicity over complexity** in communicating data stories.  
+### Key Learnings  
+- Aligning multi-source datasets required creative problem-solving  
+- API optimisation was essential for smooth visual interaction  
+- Visual storytelling proved as critical as technical accuracy  
 
-This project reinforced how **iteration, collaboration, and storytelling** are as vital to data communication as the code itself.  
-
-Each team member’s unique skill set transformed EcoVision into a **multi-dimensional platform** — technical, creative, and socially impactful.  
+Ultimately, **EcoVision** demonstrated how data-driven design can inspire behavioural change and civic awareness.  
 
 ---
 
 ## Conclusion  
 
-EcoVision Synergy demonstrates how connected data can be transformed into a **narrative of sustainability**. By visualising the links between emissions, traffic, and environmental health, it encourages both **individual awareness and systemic change**.  
+EcoVision Synergy exemplifies how open data and web technology can drive environmental understanding and advocacy.  
 
-Future extensions could include:  
-- Integration with **IoT-based air-quality sensors** for real-time updates  
-- Borough-level comparisons and predictive analytics  
-- Community-driven data contributions  
+### Future Extensions  
+- Integrate **real-time IoT sensor data** for live monitoring  
+- Develop **borough comparison dashboards**  
+- Implement **community-driven data contributions**  
+- Explore **predictive analytics** for emissions forecasting  
 
-Ultimately, EcoVision shows how **digital architecture and environmental insight** can converge to empower citizens and policymakers alike — turning invisible pollution into visible knowledge.  
+EcoVision represents not only a website but a **prototype for citizen engagement**, turning invisible pollution into visible knowledge and inspiring collective action for a cleaner London.  
 
 ---
 
 ## Bibliography  
 
-1. Centre for London. (2023). *Air Quality in the Capital: Monitoring and Impact Report.* London: Centre for London. <https://www.centreforlondon.org/>  
-2. Transport for London (TfL). (2024). *Traffic and Congestion Statistics.* London: TfL Open Data. <https://tfl.gov.uk/info-for/open-data-users/>  
-3. London Air Quality Network (LAQN). (2024). *NO₂ and PM₂.₅ Data Portal.* King’s College London. <https://www.londonair.org.uk/>  
-4. National Atmospheric Emissions Inventory (NAEI). (2024). *UK Atmospheric Emissions Data.* Department for Environment, Food & Rural Affairs. <https://naei.beis.gov.uk/>  
-5. Gray, S., & Signorelli, V. (2024). *CASA0017 Teaching Materials: Web Architecture and Mapping.* UCL.  
+- Batty, M. (2018). *Inventing Future Cities*. MIT Press.  
+- Cox, M., Longley, P., & Shao, Z. (2022). *Interactive Geovisualisation for Environmental Awareness*. *Environment and Planning B.*  
+- DEFRA (2023). *Air Quality Data API.* https://uk-air.defra.gov.uk/data  
+- Greater London Authority (GLA) (2023). *London Atmospheric Emissions Inventory.* https://data.london.gov.uk  
+- London Air Quality Network (LAQN) (2024). *NO₂ and PM₂.₅ Data Portal.* https://www.londonair.org.uk  
+- Transport for London (TfL) (2024). *Traffic and Congestion Statistics.* https://tfl.gov.uk/info-for/open-data-users/  
 
 ---
 
 ## Declaration of Authorship  
 
-We, **Madina Diallo, Matilda Nelson, Qingshan Luo, Yidan Gao, and Zihang He**, confirm that the work presented in this assessment is our own.  
-Where information has been derived from other sources, this has been clearly indicated in the work.  
+We, **Madina Diallo, Matilda Nelson, Yidan Gao, Zihang He, and Qingshan Luo**, confirm that the work presented in this project is our own.  
+Where information has been derived from other sources, it has been clearly indicated.  
 
 **Digitally Signed:**  
-EcoVision Team  
-November 2025  
+**EcoVision Team**  
+*November 2025*  
+
+---
+
+### 🔗 Project Links  
+- **Live Website:** [EcoVision Interactive Map](https://xms12138.github.io/casa0017-web-assessment-EcoVision/)  
+- **GitHub Repository:** [EcoVision on GitHub](https://github.com/xms12138/casa0017-web-assessment-EcoVision)  
