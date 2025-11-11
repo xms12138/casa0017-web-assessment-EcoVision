@@ -58,8 +58,8 @@ export default {
         container: mapContainer.value,
         style: "mapbox://styles/mapbox/standard",
         center: [-0.1276, 51.5072],
-        zoom: 10.2,
-        pitch: 60,
+        zoom: 12,
+        pitch: 60, // 🎯 倾斜视角，让线有3D感
         bearing: -20,
         antialias: true,
       });
@@ -67,135 +67,16 @@ export default {
       map.addControl(new mapboxgl.NavigationControl(), "top-right");
 
       map.on("load", async () => {
-        // 绘制工具
         draw = new MapboxDraw({
           displayControlsDefault: false,
-          controls: { line_string: true, trash: true },
+          controls: {
+            line_string: true,
+            trash: true,
+          },
         });
         map.addControl(draw, "top-left");
 
-        // 1️⃣ 加载伦敦 33 Borough 边界（深色 + 标签）
-        try {
-          const resBoroughs = await fetch("/london_boroughs.geojson");
-          if (!resBoroughs.ok) {
-            console.error("[Boroughs] 加载失败:", resBoroughs.status);
-          } else {
-            const boroughsGeo = await resBoroughs.json();
-
-            // 分配更深色的调色板
-            const palette = [
-              "#1d4ed8",
-              "#9333ea",
-              "#dc2626",
-              "#16a34a",
-              "#0891b2",
-              "#b45309",
-              "#7e22ce",
-              "#2563eb",
-              "#ea580c",
-              "#047857",
-              "#0f766e",
-              "#be185d",
-              "#c2410c",
-              "#166534",
-              "#3b82f6",
-              "#6d28d9",
-              "#9d174d",
-              "#b91c1c",
-              "#15803d",
-              "#0e7490",
-              "#78350f",
-              "#312e81",
-              "#991b1b",
-              "#1e40af",
-              "#5b21b6",
-              "#9a3412",
-              "#14532d",
-              "#134e4a",
-              "#831843",
-              "#7c2d12",
-              "#064e3b",
-              "#0f172a",
-              "#701a75",
-            ];
-
-            if (boroughsGeo.features?.length) {
-              boroughsGeo.features.forEach((f, i) => {
-                f.properties = f.properties || {};
-                f.properties._color = palette[i % palette.length];
-                // 优先选择 name/NAME/borough 字段作为显示名
-                f.properties._label =
-                  f.properties.name ||
-                  f.properties.NAME ||
-                  f.properties.borough ||
-                  `Area ${i + 1}`;
-              });
-            }
-
-            if (!map.getSource("london-boroughs")) {
-              map.addSource("london-boroughs", {
-                type: "geojson",
-                data: boroughsGeo,
-              });
-            }
-
-            // 填充层：更深一点的透明度
-            if (!map.getLayer("london-boroughs-fill")) {
-              map.addLayer({
-                id: "london-boroughs-fill",
-                type: "fill",
-                source: "london-boroughs",
-                paint: {
-                  "fill-color": ["get", "_color"],
-                  "fill-opacity": 0.35,
-                },
-              });
-            }
-
-            // 边界线层：更粗更亮
-            if (!map.getLayer("london-boroughs-outline")) {
-              map.addLayer({
-                id: "london-boroughs-outline",
-                type: "line",
-                source: "london-boroughs",
-                layout: {
-                  "line-cap": "round",
-                  "line-join": "round",
-                },
-                paint: {
-                  "line-color": ["get", "_color"],
-                  "line-width": 2.2,
-                  "line-opacity": 0.95,
-                },
-              });
-            }
-
-            // 名称标签层
-            if (!map.getLayer("london-boroughs-label")) {
-              map.addLayer({
-                id: "london-boroughs-label",
-                type: "symbol",
-                source: "london-boroughs",
-                layout: {
-                  "text-field": ["get", "_label"],
-                  "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
-                  "text-size": 12,
-                  "text-offset": [0, 0],
-                  "text-anchor": "center",
-                },
-                paint: {
-                  "text-color": "#f1f5f9",
-                  "text-halo-color": "#020817",
-                  "text-halo-width": 1.2,
-                },
-              });
-            }
-          }
-        } catch (e) {
-          console.error("[Boroughs] 加载出错:", e);
-        }
-
-        // 2️⃣ 加载已有 busiest_streets（如果有）
+        // 预加载已有参考线
         try {
           const res = await fetch("/busiest_streets.geojson");
           if (res.ok) {
@@ -206,6 +87,7 @@ export default {
                 data: geo,
               });
             }
+            // 🎯 添加 3D 高亮线层
             if (!map.getLayer("busiest-streets-line")) {
               map.addLayer({
                 id: "busiest-streets-line",
@@ -217,19 +99,20 @@ export default {
                 },
                 paint: {
                   "line-color": "#ff3b30",
-                  "line-width": 8,
+                  "line-width": 8, // 更粗
                   "line-blur": 2,
                   "line-opacity": 0.95,
-                  "line-offset": 1.5,
+                  "line-offset": 1.5, // 模拟立体层
                   "line-translate": [0, -1.5],
                 },
               });
             }
           }
         } catch (e) {
-          console.warn("[Busiest] No existing busiest_streets.geojson");
+          console.warn("No existing busiest_streets.geojson");
         }
 
+        // 暴露控制台工具
         window._matchMap = map;
         window._draw = draw;
       });
@@ -242,10 +125,8 @@ export default {
       if (coords.length > maxPoints) {
         const step = Math.ceil(coords.length / maxPoints);
         pts = coords.filter((_, i) => i % step === 0);
-        const last = coords[coords.length - 1];
-        const lastPts = pts[pts.length - 1];
-        if (lastPts[0] !== last[0] || lastPts[1] !== last[1]) {
-          pts.push(last);
+        if (pts[pts.length - 1] !== coords[coords.length - 1]) {
+          pts.push(coords[coords.length - 1]);
         }
       }
 
@@ -257,8 +138,7 @@ export default {
 
       const res = await fetch(url);
       const data = await res.json();
-      if (!data.matchings || !data.matchings.length)
-        throw new Error("No matchings returned");
+      if (!data.matchings?.length) throw new Error("No matchings returned");
       return data.matchings[0].geometry;
     };
 
@@ -266,13 +146,14 @@ export default {
     const onSnapAndExport = async () => {
       if (!draw) return;
       const all = draw.getAll();
-      if (!all.features || !all.features.length) {
+      if (!all.features?.length) {
         alert("请先画几条线再导出");
         return;
       }
 
       snapping.value = true;
       const snapped = [];
+
       for (const f of all.features) {
         if (f.geometry?.type === "LineString") {
           try {
@@ -287,9 +168,14 @@ export default {
           }
         }
       }
+
       snapping.value = false;
 
-      const out = { type: "FeatureCollection", features: snapped };
+      const out = {
+        type: "FeatureCollection",
+        features: snapped,
+      };
+
       console.log(
         "✅ Snapped GeoJSON (save as busiest_streets.geojson):",
         JSON.stringify(out, null, 2)
@@ -297,6 +183,7 @@ export default {
 
       alert("贴合完成！控制台已输出 GeoJSON。");
 
+      // 更新地图展示
       if (map.getSource("busiest-streets")) {
         map.getSource("busiest-streets").setData(out);
       } else {
@@ -322,6 +209,7 @@ export default {
     };
 
     onMounted(initMap);
+
     onBeforeUnmount(() => {
       if (map) map.remove();
     });
